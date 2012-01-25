@@ -50,3 +50,4 @@ def tenant_filter(queryset):
         t = get_current_tenant()
         return queryset.filter(tenant=t)   
     return queryset 
+

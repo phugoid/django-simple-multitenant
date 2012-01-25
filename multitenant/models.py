@@ -22,13 +22,11 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.contrib.auth.models import User
 from django.conf import settings    # We look at DEBUG only, from settings
+from django.contrib.contenttypes.models import ContentType
 
 from middleware import get_current_tenant
+from settings import BASE_TENANT_ID
 
-
-# The ID number for the tenant to be cloned whenever a new tenant is created.
-# Right now, we're basing all new tenant on BASE_TENANT_ID
-BASE_TENANT_ID = 3
 
 class TenantMgr(models.Manager):
     def get_query_set(self):
@@ -90,6 +88,11 @@ class TenantModel(models.Model):
         abstract = True
 
 
+# For testing purposes only
+class TestTenantAwareModel(TenantModel):
+    name = models.CharField(max_length=10)
+
+
 def clone_model_instance(instance, new_values={}):
     """
     WARNING: This function will NOT clone the instance's m2m fields if there are any.
@@ -138,7 +141,14 @@ def clone_model(model_class, source_tenant=BASE_TENANT_ID, dest_tenant='current_
             clone_model_instance(i, { 'tenant': dest_tenant })
 
 
+
 def get_profile_class():
+    app_label, model = settings.AUTH_PROFILE_MODULE.split('.')
+    content_type = ContentType.objects.get(app_label=app_label, model=model.lower())
+    return content_type.model_class()
+
+
+def get_profile_class_old():
     # Determine what is the Model Class that holds user profiles:
     users = User.objects.all()
     if users:
