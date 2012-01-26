@@ -91,6 +91,9 @@ class TenantModel(models.Model):
 # For testing purposes only
 class TestTenantAwareModel(TenantModel):
     name = models.CharField(max_length=10)
+    fkfield = models.ForeignKey("self", blank=True, null=True)
+    m2mfield = models.ManyToManyField("self")
+    
 
 
 def clone_model_instance(instance, new_values={}):

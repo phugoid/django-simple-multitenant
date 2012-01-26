@@ -46,8 +46,10 @@ example::
 	class CompanyForm(TenantModelForm):
 	    class Meta:
 	        model = Company
+	        exclude = ['tenant']
 
-Note that we don't need to worry about filtering the options available for each form field.
+Note that we don't need to worry about filtering the options available for each form field.  You should exclude the tenant form field
+as above, not out of security concerns but rather to avoid complications while cleaning the form.
 	
 
 Admin
